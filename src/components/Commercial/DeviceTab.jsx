@@ -1,23 +1,55 @@
 import React, { useState } from 'react';
+import useSmsConfig from '../../hooks/useSmsConfig';
+import { sendSmsAlert, sendTestSms, isValidPhoneNumber } from '../../utils/smsNotification';
 
 const DeviceTab = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [logs, setLogs] = useState([
-    { id: 1, timestamp: '2026-01-29 10:15:23', status: 'Drowsiness Detected' },
-    { id: 2, timestamp: '2026-01-29 09:45:12', status: 'Drowsiness Detected' },
-    { id: 3, timestamp: '2026-01-29 09:20:45', status: 'Drowsiness Detected' },
-    { id: 4, timestamp: '2026-01-29 08:55:30', status: 'Drowsiness Detected' },
-    { id: 5, timestamp: '2026-01-29 08:12:18', status: 'Drowsiness Detected' },
-    { id: 6, timestamp: '2026-01-29 07:45:55', status: 'Drowsiness Detected' },
-    { id: 7, timestamp: '2026-01-29 07:10:32', status: 'Drowsiness Detected' },
+    { id: 1, timestamp: '2026-01-29 10:15:23', status: 'Drowsiness Detected', smsSent: false },
+    { id: 2, timestamp: '2026-01-29 09:45:12', status: 'Drowsiness Detected', smsSent: false },
+    { id: 3, timestamp: '2026-01-29 09:20:45', status: 'Drowsiness Detected', smsSent: false },
+    { id: 4, timestamp: '2026-01-29 08:55:30', status: 'Drowsiness Detected', smsSent: false },
+    { id: 5, timestamp: '2026-01-29 08:12:18', status: 'Drowsiness Detected', smsSent: false },
+    { id: 6, timestamp: '2026-01-29 07:45:55', status: 'Drowsiness Detected', smsSent: false },
+    { id: 7, timestamp: '2026-01-29 07:10:32', status: 'Drowsiness Detected', smsSent: false },
   ]);
+  const [isSendingTest, setIsSendingTest] = useState(false);
+
+  // SMS Configuration Hook
+  const smsConfig = useSmsConfig('commercial_device');
 
   const handleConnect = () => {
     setIsConnected(!isConnected);
   };
 
+  const handleTestSms = async () => {
+    if (!isValidPhoneNumber(smsConfig.primaryPhone)) {
+      smsConfig.showToast('Please enter a valid phone number (+country code)', 'error');
+      return;
+    }
+
+    setIsSendingTest(true);
+    const result = await sendTestSms(smsConfig.primaryPhone);
+    setIsSendingTest(false);
+
+    if (result.success) {
+      smsConfig.showToast('Test SMS sent successfully!', 'success');
+      smsConfig.recordSmsSent();
+    } else {
+      smsConfig.showToast(result.error || 'Failed to send test SMS', 'error');
+    }
+  };
+
   return (
     <div className="device-tab">
+      {/* Toast Notification */}
+      {smsConfig.toast && (
+        <div className={`sms-toast sms-toast-${smsConfig.toast.type}`}>
+          <span>{smsConfig.toast.message}</span>
+          <button onClick={smsConfig.clearToast} className="toast-close">×</button>
+        </div>
+      )}
+
       <div className="device-header">
         <div className="device-status-card">
           <div className="status-row">
@@ -47,7 +79,105 @@ const DeviceTab = () => {
               )}
             </button>
           </div>
-          
+
+          {/* SMS Configuration Section */}
+          <div className="sms-config">
+            <div className="config-section">
+              <div className="sms-header">
+                <h4>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  SMS Alerts
+                </h4>
+                <div className="sms-status-badge">
+                  {smsConfig.backendAvailable ? (
+                    <span className="status-online">● Online</span>
+                  ) : (
+                    <span className="status-offline">● Backend Offline</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="config-options">
+                <div className="config-item toggle-item">
+                  <span className="config-label">Enable SMS Alerts:</span>
+                  <label className="toggle-switch">
+                    <input
+                      type="checkbox"
+                      checked={smsConfig.isEnabled}
+                      onChange={smsConfig.toggleEnabled}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div className="config-item">
+                  <span className="config-label">Primary Phone:</span>
+                  <input
+                    type="tel"
+                    className={`config-input ${smsConfig.primaryPhone && !isValidPhoneNumber(smsConfig.primaryPhone) ? 'input-error' : ''}`}
+                    placeholder="+1234567890"
+                    value={smsConfig.primaryPhone}
+                    onChange={(e) => smsConfig.updateConfig('primaryPhone', e.target.value)}
+                  />
+                </div>
+
+                <div className="config-item">
+                  <span className="config-label">Secondary Phone:</span>
+                  <input
+                    type="tel"
+                    className="config-input"
+                    placeholder="+1234567890 (optional)"
+                    value={smsConfig.secondaryPhone}
+                    onChange={(e) => smsConfig.updateConfig('secondaryPhone', e.target.value)}
+                  />
+                </div>
+
+                <div className="config-item">
+                  <span className="config-label">Alert Threshold:</span>
+                  <select
+                    className="config-input config-select"
+                    value={smsConfig.alertThreshold}
+                    onChange={(e) => smsConfig.updateConfig('alertThreshold', parseInt(e.target.value))}
+                  >
+                    <option value={1}>Immediate (1st detection)</option>
+                    <option value={2}>After 2 detections</option>
+                    <option value={3}>After 3 detections</option>
+                  </select>
+                </div>
+
+                <div className="config-item sms-actions">
+                  <button
+                    className="test-sms-btn"
+                    onClick={handleTestSms}
+                    disabled={!smsConfig.backendAvailable || isSendingTest || !smsConfig.primaryPhone}
+                  >
+                    {isSendingTest ? (
+                      <>
+                        <span className="spinner"></span>
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <line x1="22" y1="2" x2="11" y2="13"></line>
+                          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Test SMS
+                      </>
+                    )}
+                  </button>
+                  {smsConfig.lastSmsSent && (
+                    <span className="last-sms-time">
+                      Last sent: {new Date(smsConfig.lastSmsSent).toLocaleTimeString()}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="device-info">
             <div className="info-item">
               <span className="info-label">Device ID</span>
@@ -96,6 +226,13 @@ const DeviceTab = () => {
                     <p className="log-status">{log.status}</p>
                     <span className="log-timestamp">{log.timestamp}</span>
                   </div>
+                  {log.smsSent && (
+                    <div className="log-sms-badge" title="SMS Alert Sent">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </div>
+                  )}
                   <div className="log-badge">Alert</div>
                 </div>
               ))}

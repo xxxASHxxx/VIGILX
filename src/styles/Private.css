@@ -711,3 +711,249 @@
 .private-container .log-timestamp {
   color: #8B5A6F !important;
 }
+
+/* ============================================
+   SMS Configuration Styles
+   ============================================ */
+
+.sms-config {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #FBF5F7;
+}
+
+.sms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.sms-header h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #3D0814;
+  margin: 0;
+}
+
+.sms-header h4 svg {
+  color: #8B1538;
+}
+
+.sms-status-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sms-status-badge .status-online {
+  color: #10B981;
+}
+
+.sms-status-badge .status-offline {
+  color: #EF4444;
+}
+
+/* Toggle Switch */
+.toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #E8D5D0;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+  background: linear-gradient(135deg, #8B1538, #DB2777);
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+  transform: translateX(24px);
+}
+
+/* Config Select */
+.config-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B5A6F' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+/* Input Error State */
+.input-error {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* SMS Actions */
+.sms-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.test-sms-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #8B1538, #DB2777);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.test-sms-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(139, 21, 56, 0.4);
+}
+
+.test-sms-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.test-sms-btn svg {
+  stroke: currentColor;
+}
+
+/* Spinner */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.last-sms-time {
+  font-size: 0.75rem;
+  color: #8B5A6F;
+}
+
+/* Log SMS Badge */
+.log-sms-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, #8B1538, #DB2777);
+  border-radius: 50%;
+  color: white;
+}
+
+/* Toast Notifications */
+.sms-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.sms-toast-success {
+  border-left: 4px solid #10B981;
+}
+
+.sms-toast-success span {
+  color: #065F46 !important;
+}
+
+.sms-toast-error {
+  border-left: 4px solid #EF4444;
+}
+
+.sms-toast-error span {
+  color: #991B1B !important;
+}
+
+.sms-toast-info {
+  border-left: 4px solid #8B1538;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #8B5A6F;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.toast-close:hover {
+  color: #3D0814;
+}
