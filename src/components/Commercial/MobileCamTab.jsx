@@ -48,6 +48,7 @@ const MobileCamTab = () => {
         </div>
       )}
 
+      {/* Header with Status and Connection Controls */}
       <div className="device-header">
         <div className="device-status-card">
           <div className="status-row">
@@ -78,6 +79,48 @@ const MobileCamTab = () => {
             </button>
           </div>
 
+          {/* ============================================
+              VIDEO FEED PLACEHOLDER - Hero Element
+              ============================================ */}
+          <div className="video-feed-container">
+            <div className="video-feed-placeholder">
+              {isConnected ? (
+                <>
+                  <div className="video-live-indicator">
+                    <div className="live-dot"></div>
+                    <span>LIVE</span>
+                  </div>
+                  <video
+                    className="video-feed-player"
+                    src={`${process.env.PUBLIC_URL}/mobilecam-demo.mp4`}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    onError={(e) => {
+                      console.log('Video not found, showing placeholder');
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="video-placeholder-content">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                  </svg>
+                  <h4>Mobile Camera Feed</h4>
+                  <p>Scan QR code to connect your mobile</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ============================================
+              CONFIGURATION SECTIONS - Below Video
+              ============================================ */}
+
+          {/* QR Code Connection Section */}
           <div className="connection-info">
             <div className="qr-section">
               <div className="qr-image-container">
@@ -203,6 +246,7 @@ const MobileCamTab = () => {
             </div>
           </div>
 
+          {/* Device Info Stats */}
           <div className="device-info">
             <div className="info-item">
               <span className="info-label">Connection Type</span>
@@ -220,6 +264,7 @@ const MobileCamTab = () => {
         </div>
       </div>
 
+      {/* Detection Log Section */}
       <div className="logs-section">
         <div className="section-header">
           <h3>Drowsiness Detection Log</h3>

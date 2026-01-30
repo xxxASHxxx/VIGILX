@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import useSmsConfig from '../../hooks/useSmsConfig';
 import { sendSmsAlert, sendTestSms, isValidPhoneNumber } from '../../utils/smsNotification';
+import AlertSimulator from '../Simulation/AlertSimulator';
 
 const DashcamTab = () => {
   const [isConnected, setIsConnected] = useState(false);
+  const [showSimulator, setShowSimulator] = useState(false);
   const [logs, setLogs] = useState([
     { id: 1, timestamp: '2026-01-29 10:48:37', status: 'Drowsiness Detected', smsSent: false },
     { id: 2, timestamp: '2026-01-29 10:22:19', status: 'Drowsiness Detected', smsSent: false },
@@ -92,6 +94,7 @@ const DashcamTab = () => {
         </div>
       )}
 
+      {/* Header with Status and Connection Controls */}
       <div className="device-header">
         <div className="device-status-card">
           <div className="status-row">
@@ -102,26 +105,80 @@ const DashcamTab = () => {
                 {isConnected ? 'Connected' : 'Disconnected'}
               </div>
             </div>
-            <button className="connect-btn" onClick={handleConnect}>
-              {isConnected ? (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                  Disconnect
-                </>
-              ) : (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                  </svg>
-                  Connect Dashcam
-                </>
-              )}
-            </button>
+            <div className="action-buttons">
+              <button className="connect-btn" onClick={handleConnect}>
+                {isConnected ? (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Disconnect
+                  </>
+                ) : (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Connect Dashcam
+                  </>
+                )}
+              </button>
+              <button
+                className="connect-btn"
+                onClick={() => setShowSimulator(!showSimulator)}
+                style={{ background: showSimulator ? 'linear-gradient(135deg, #8B1538, #DB2777)' : undefined }}
+              >
+                🔬 {showSimulator ? 'Hide Simulator' : 'Alert Simulator'}
+              </button>
+            </div>
           </div>
 
+          {/* ============================================
+              VIDEO FEED PLACEHOLDER - Hero Element
+              ============================================ */}
+          <div className="video-feed-container">
+            <div className="video-feed-placeholder">
+              {isConnected ? (
+                <>
+                  <div className="video-live-indicator">
+                    <div className="live-dot"></div>
+                    <span>LIVE</span>
+                  </div>
+                  <video
+                    className="video-feed-player"
+                    src={`${process.env.PUBLIC_URL}/dashcam-demo.mp4`}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    onError={(e) => {
+                      console.log('Video not found, showing placeholder');
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="video-placeholder-content">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                  </svg>
+                  <h4>Dashcam Feed</h4>
+                  <p>Connect dashcam to start monitoring</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Alert Simulator */}
+          {showSimulator && <AlertSimulator dashboardType="commercial" />}
+
+          {/* ============================================
+              CONFIGURATION SECTIONS - Below Video
+              ============================================ */}
+
+          {/* Dashcam Configuration */}
           <div className="dashcam-config">
             <div className="config-section">
               <h4>Dashcam Configuration</h4>
@@ -255,6 +312,7 @@ const DashcamTab = () => {
             </div>
           </div>
 
+          {/* Device Info Stats */}
           <div className="device-info">
             <div className="info-item">
               <span className="info-label">Connection Type</span>
@@ -272,6 +330,7 @@ const DashcamTab = () => {
         </div>
       </div>
 
+      {/* Detection Log Section */}
       <div className="logs-section">
         <div className="section-header">
           <h3>Drowsiness Detection Log</h3>

@@ -957,3 +957,129 @@
 .toast-close:hover {
   color: #3D0814;
 }
+
+/* ============================================
+   VIDEO FEED PLACEHOLDER STYLES
+   ============================================ */
+
+.video-feed-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 24px auto;
+  padding: 0 16px;
+}
+
+.video-feed-placeholder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(145deg, #1a0a0f 0%, #2d1219 50%, #1a0a0f 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(139, 21, 56, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow:
+    0 8px 32px rgba(90, 14, 36, 0.2),
+    inset 0 0 60px rgba(0, 0, 0, 0.3);
+}
+
+.video-placeholder-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  color: rgba(232, 155, 163, 0.6);
+  text-align: center;
+  padding: 20px;
+}
+
+.video-placeholder-content svg {
+  opacity: 0.4;
+}
+
+.video-placeholder-content h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: rgba(232, 155, 163, 0.8) !important;
+}
+
+.video-placeholder-content p {
+  font-size: 0.95rem;
+  margin: 0;
+  color: rgba(232, 155, 163, 0.5) !important;
+}
+
+.video-live-indicator {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(220, 38, 38, 0.9);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+/* Video Feed Player */
+.video-feed-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  z-index: 0;
+}
+
+/* Responsive Video Placeholder */
+@media (max-width: 768px) {
+  .video-feed-container {
+    padding: 0 8px;
+  }
+
+  .video-placeholder-content svg {
+    width: 60px;
+    height: 60px;
+  }
+
+  .video-placeholder-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .video-placeholder-content p {
+    font-size: 0.85rem;
+  }
+}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import useSmsConfig from '../../hooks/useSmsConfig';
-import { sendSmsAlert, sendTestSms, isValidPhoneNumber } from '../../utils/smsNotification';
+import { sendTestSms, isValidPhoneNumber } from '../../utils/smsNotification';
 
 const DashcamTab = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -47,6 +47,7 @@ const DashcamTab = () => {
         </div>
       )}
 
+      {/* Header with Status and Connection Controls */}
       <div className="device-header">
         <div className="device-status-card">
           <div className="status-row">
@@ -77,6 +78,48 @@ const DashcamTab = () => {
             </button>
           </div>
 
+          {/* ============================================
+              VIDEO FEED PLACEHOLDER - Hero Element
+              ============================================ */}
+          <div className="video-feed-container">
+            <div className="video-feed-placeholder">
+              {isConnected ? (
+                <>
+                  <div className="video-live-indicator">
+                    <div className="live-dot"></div>
+                    <span>LIVE</span>
+                  </div>
+                  <video
+                    className="video-feed-player"
+                    src={`${process.env.PUBLIC_URL}/dashcam-demo.mp4`}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    onError={(e) => {
+                      console.log('Video not found, showing placeholder');
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </>
+              ) : (
+                <div className="video-placeholder-content">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                  </svg>
+                  <h4>Dashcam Feed</h4>
+                  <p>Connect dashcam to start monitoring</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* ============================================
+              CONFIGURATION SECTIONS - Below Video
+              ============================================ */}
+
+          {/* Dashcam Configuration Section */}
           <div className="dashcam-config">
             <div className="config-section">
               <h4>Dashcam Configuration</h4>
@@ -210,6 +253,7 @@ const DashcamTab = () => {
             </div>
           </div>
 
+          {/* Device Info Stats */}
           <div className="device-info">
             <div className="info-item">
               <span className="info-label">Connection Type</span>
@@ -227,6 +271,7 @@ const DashcamTab = () => {
         </div>
       </div>
 
+      {/* Detection Log Section */}
       <div className="logs-section">
         <div className="section-header">
           <h3>Drowsiness Detection Log</h3>
