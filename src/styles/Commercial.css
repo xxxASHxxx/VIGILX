@@ -1148,3 +1148,541 @@
   border-radius: 14px;
   z-index: 0;
 }
+/* ============================================
+   ESP32-CAM Detection Overlays
+   ============================================ */
+
+.detection-overlay {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 180px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+
+.detection-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+}
+
+.stat-good {
+  color: #10b981;
+}
+
+.stat-alert {
+  color: #ef4444;
+  animation: alertPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(139, 21, 56, 0.2);
+  border-top-color: #8B1538;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: #ef4444;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 400px;
+}
+
+.error-message svg {
+  flex-shrink: 0;
+  stroke: currentColor;
+}
+
+.connect-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.connect-btn:disabled:hover {
+  background: #5A0E24 !important;
+  box-shadow: none !important;
+}
+
+.video-feed-player {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+
+/* ============================================
+   ENHANCED ESP32-CAM PLACEHOLDER STYLES
+   ============================================ */
+
+.esp32-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  text-align: center;
+  gap: 24px;
+}
+
+.esp32-placeholder.connecting {
+  gap: 16px;
+}
+
+/* Camera Icon Animation */
+.camera-icon-wrapper {
+  margin-bottom: 8px;
+}
+
+.camera-icon {
+  color: var(--burgundy-primary, #6b1c3d);
+  filter: drop-shadow(0 4px 12px rgba(107, 28, 61, 0.3));
+}
+
+/* Headings */
+.tech-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #5A0E24;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.tech-subheading {
+  font-size: 1rem;
+  color: #8B5A6F;
+  margin: 0;
+  font-weight: 500;
+}
+
+.placeholder-subtitle {
+  font-size: 0.9rem;
+  color: #8B5A6F;
+  margin: 8px 0 0 0;
+}
+
+/* Features Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin: 16px 0;
+}
+
+/* Device Specifications */
+.device-specs {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: rgba(90, 14, 36, 0.05);
+  border: 1px solid rgba(90, 14, 36, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.spec-item:hover {
+  background: rgba(90, 14, 36, 0.08);
+  border-color: rgba(90, 14, 36, 0.2);
+  transform: translateY(-2px);
+}
+
+.spec-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.spec-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.spec-label {
+  font-size: 0.75rem;
+  color: #8B5A6F;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.spec-value {
+  font-size: 0.95rem;
+  color: #5A0E24;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+/* Troubleshooting Section */
+.troubleshooting-section {
+  width: 100%;
+  max-width: 600px;
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(90, 14, 36, 0.03);
+  border: 1px solid rgba(90, 14, 36, 0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.troubleshooting-section:hover {
+  background: rgba(90, 14, 36, 0.05);
+  border-color: rgba(90, 14, 36, 0.15);
+}
+
+.troubleshooting-section summary {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #5A0E24;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.troubleshooting-section summary::before {
+  content: '';
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.troubleshooting-section[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.troubleshooting-steps {
+  margin: 16px 0 0 0;
+  padding-left: 24px;
+  text-align: left;
+}
+
+.troubleshooting-steps li {
+  margin: 8px 0;
+  color: #8B5A6F;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Connection Progress */
+.connection-progress {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 16px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(90, 14, 36, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6b1c3d 0%, #8b2c5d 100%);
+  animation: progressIndeterminate 1.5s ease-in-out infinite;
+}
+
+/* ============================================
+   VIDEO OVERLAY SYSTEM
+   ============================================ */
+
+/* Top Overlay - LIVE Badge & Metric Pills */
+.video-overlay-top {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  z-index: 10;
+}
+
+.video-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(239, 68, 68, 0.9);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Metric Pills */
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.pill-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.pill-value {
+  color: white;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.pill-normal {
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.pill-normal .pill-value {
+  color: #10b981;
+}
+
+.pill-alert {
+  border-color: rgba(239, 68, 68, 0.5);
+  animation: alertPulse 1.5s ease-in-out infinite;
+}
+
+.pill-alert .pill-value {
+  color: #ef4444;
+}
+
+/* Bottom Overlay - Counters & Source Badge */
+.video-overlay-bottom {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  z-index: 10;
+}
+
+.counter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.counter-badge svg {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.source-badge {
+  margin-left: auto;
+  padding: 6px 12px;
+  background: linear-gradient(135deg, #6b1c3d 0%, #8b2c5d 100%);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(107, 28, 61, 0.4);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - ENHANCED PLACEHOLDER
+   ============================================ */
+
+@media (max-width: 768px) {
+  .esp32-placeholder {
+    padding: 32px 20px;
+    gap: 20px;
+  }
+
+  .camera-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .tech-heading {
+    font-size: 1.4rem;
+  }
+
+  .tech-subheading {
+    font-size: 0.9rem;
+  }
+
+  .features-grid {
+    gap: 10px;
+  }
+
+  .device-specs {
+    gap: 12px;
+  }
+
+  .spec-item {
+    padding: 10px 16px;
+  }
+
+  .spec-icon {
+    font-size: 20px;
+  }
+
+  .spec-label {
+    font-size: 0.7rem;
+  }
+
+  .spec-value {
+    font-size: 0.85rem;
+  }
+
+  .troubleshooting-section {
+    padding: 12px;
+  }
+
+  .troubleshooting-section summary {
+    font-size: 0.85rem;
+  }
+
+  .troubleshooting-steps li {
+    font-size: 0.85rem;
+  }
+
+  /* Video Overlays Mobile */
+  .video-overlay-top,
+  .video-overlay-bottom {
+    left: 8px;
+    right: 8px;
+    gap: 8px;
+  }
+
+  .video-overlay-top {
+    top: 8px;
+  }
+
+  .video-overlay-bottom {
+    bottom: 8px;
+  }
+
+  .metric-pill,
+  .counter-badge {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+  }
+
+  .pill-label {
+    font-size: 0.7rem;
+  }
+
+  .pill-value {
+    font-size: 0.8rem;
+  }
+
+  .video-live-indicator {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  .live-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .source-badge {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  .counter-badge svg {
+    width: 14px;
+    height: 14px;
+  }
+}

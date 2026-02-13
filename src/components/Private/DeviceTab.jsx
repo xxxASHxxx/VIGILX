@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import useSmsConfig from '../../hooks/useSmsConfig';
+import useESP32Connection from '../../hooks/useESP32Connection';
 import { sendTestSms, isValidPhoneNumber } from '../../utils/smsNotification';
+import { FeatureItem, StatusCard, DrowsinessMeter } from '../shared';
 
 const DeviceTab = () => {
-  const [isConnected, setIsConnected] = useState(false);
   const [logs, setLogs] = useState([
     { id: 1, timestamp: '2026-01-29 11:15:42', status: 'Drowsiness Detected', smsSent: false },
     { id: 2, timestamp: '2026-01-29 10:48:33', status: 'Drowsiness Detected', smsSent: false },
@@ -15,8 +16,11 @@ const DeviceTab = () => {
   // SMS Configuration Hook
   const smsConfig = useSmsConfig('private_device');
 
-  const handleConnect = () => {
-    setIsConnected(!isConnected);
+  // ESP32-CAM Connection Hook
+  const esp32 = useESP32Connection();
+
+  const handleConnect = async () => {
+    await esp32.toggleConnection();
   };
 
   const handleTestSms = async () => {
@@ -53,13 +57,17 @@ const DeviceTab = () => {
           <div className="status-row">
             <div className="status-info">
               <h3>ESP32-CAM Device</h3>
-              <div className={`status-indicator ${isConnected ? 'connected' : 'disconnected'}`}>
+              <div className={`status-indicator ${esp32.isConnected ? 'connected' : 'disconnected'}`}>
                 <span className="status-dot"></span>
-                {isConnected ? 'Connected' : 'Disconnected'}
+                {esp32.isConnecting ? 'Connecting...' : (esp32.isConnected ? 'Connected' : 'Disconnected')}
               </div>
             </div>
-            <button className="connect-btn" onClick={handleConnect}>
-              {isConnected ? (
+            <button
+              className="connect-btn"
+              onClick={handleConnect}
+              disabled={esp32.isConnecting}
+            >
+              {esp32.isConnected ? (
                 <>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -83,34 +91,185 @@ const DeviceTab = () => {
               ============================================ */}
           <div className="video-feed-container">
             <div className="video-feed-placeholder">
-              {isConnected ? (
+              {esp32.isConnected ? (
                 <>
-                  <div className="video-live-indicator">
-                    <div className="live-dot"></div>
-                    <span>LIVE</span>
-                  </div>
-                  <video
+                  {/* Live MJPEG Stream from Flask Server */}
+                  <img
                     className="video-feed-player"
-                    src={`${process.env.PUBLIC_URL}/device-demo.mp4`}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    onError={(e) => {
-                      console.log('Video not found, showing placeholder');
-                      e.target.style.display = 'none';
-                    }}
+                    src={esp32.streamUrl}
+                    alt="ESP32-CAM Live Feed"
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
+
+                  {/* Top Overlay - Status Badge & Metric Pills */}
+                  <div className="video-overlay-top">
+                    <div className="video-live-indicator">
+                      <div className="live-dot"></div>
+                      <span>LIVE</span>
+                    </div>
+                    {esp32.latestDetection && (
+                      <>
+                        <div className={`metric-pill ${esp32.latestDetection.ear > 0.25 ? 'pill-normal' : 'pill-alert'}`}>
+                          <span className="pill-label">EAR:</span>
+                          <span className="pill-value">{esp32.latestDetection.ear.toFixed(3)}</span>
+                        </div>
+                        <div className={`metric-pill ${esp32.latestDetection.mar < 0.6 ? 'pill-normal' : 'pill-alert'}`}>
+                          <span className="pill-label">MAR:</span>
+                          <span className="pill-value">{esp32.latestDetection.mar.toFixed(3)}</span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Bottom Overlay - Counters & Source Badge */}
+                  {esp32.latestDetection && (
+                    <div className="video-overlay-bottom">
+                      <div className="counter-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <span>{esp32.latestDetection.blinks || 0}/30s</span>
+                      </div>
+                      <div className="counter-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                          <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                        </svg>
+                        <span>{esp32.latestDetection.yawns || 0}/60s</span>
+                      </div>
+                      <div className="source-badge">ESP32-CAM</div>
+                    </div>
+                  )}
+
+                  {/* Drowsiness Meter - Right Sidebar */}
+                  {esp32.latestDetection && (
+                    <DrowsinessMeter
+                      percentage={Math.round((1 - esp32.latestDetection.ear) * 100)}
+                      status={esp32.latestDetection.status || 'ACTIVE'}
+                    />
+                  )}
                 </>
+              ) : esp32.isConnecting ? (
+                <div className="esp32-placeholder connecting">
+                  <div className="loading-spinner"></div>
+                  <h4>Connecting to ESP32-CAM...</h4>
+                  <p className="placeholder-subtitle">Establishing link to 192.168.4.1:80</p>
+                  <div className="connection-progress">
+                    <div className="progress-bar">
+                      <div className="progress-fill"></div>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <div className="video-placeholder-content">
-                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                    <line x1="8" y1="21" x2="16" y2="21"></line>
-                    <line x1="12" y1="17" x2="12" y2="21"></line>
-                  </svg>
-                  <h4>ESP32-CAM Feed</h4>
-                  <p>Connect ESP32-CAM device to start monitoring</p>
+                <div className="esp32-placeholder">
+                  {/* Animated Camera Icon */}
+                  <div className="camera-icon-wrapper">
+                    <svg className="camera-icon animate-pulse" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                      <circle cx="12" cy="13" r="4"></circle>
+                    </svg>
+                  </div>
+
+                  {/* Main Heading */}
+                  <h2 className="tech-heading">Real-Time Drowsiness Detection</h2>
+                  <p className="tech-subheading">Powered by ESP32-CAM + TensorFlow Lite</p>
+
+                  {/* Feature Checklist */}
+                  <div className="features-grid">
+                    <FeatureItem
+                      icon={
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      }
+                      text="Eye Closure Detection (EAR < 0.25)"
+                      delay={0.1}
+                    />
+                    <FeatureItem
+                      icon={
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                          <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                        </svg>
+                      }
+                      text="Yawn Detection (MAR > 0.40)"
+                      delay={0.2}
+                    />
+                    <FeatureItem
+                      icon={
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                      }
+                      text="Blink Rate Monitoring (12/30s alert)"
+                      delay={0.3}
+                    />
+                    <FeatureItem
+                      icon={
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                      }
+                      text="XIAO ESP32C3 Hardware Alerts"
+                      delay={0.4}
+                    />
+                  </div>
+
+                  {/* Device Specifications */}
+                  <div className="device-specs">
+                    <div className="spec-item">
+                      <span className="spec-icon">📡</span>
+                      <div className="spec-content">
+                        <span className="spec-label">Device IP</span>
+                        <span className="spec-value">192.168.4.1</span>
+                      </div>
+                    </div>
+                    <div className="spec-item">
+                      <span className="spec-icon">📷</span>
+                      <div className="spec-content">
+                        <span className="spec-label">Camera</span>
+                        <span className="spec-value">OV7670 640×480</span>
+                      </div>
+                    </div>
+                    <div className="spec-item">
+                      <span className="spec-icon">⚡</span>
+                      <div className="spec-content">
+                        <span className="spec-label">Protocol</span>
+                        <span className="spec-value">HTTP/MJPEG</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Troubleshooting Guide */}
+                  <details className="troubleshooting-section">
+                    <summary>Connection Troubleshooting Guide</summary>
+                    <ol className="troubleshooting-steps">
+                      <li>Ensure ESP32-CAM is powered on and LED is blinking</li>
+                      <li>Connect to device WiFi network (SSID: ESP32-CAM)</li>
+                      <li>Verify device IP address is 192.168.4.1</li>
+                      <li>Check Flask server is running on port 5001</li>
+                      <li>Try restarting the device if connection fails</li>
+                    </ol>
+                  </details>
+
+                  {/* Error Message */}
+                  {esp32.error && (
+                    <div className="error-message">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                      </svg>
+                      {esp32.error}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -226,11 +385,19 @@ const DeviceTab = () => {
             </div>
             <div className="info-item">
               <span className="info-label">Status</span>
-              <span className="info-value">{isConnected ? 'Active' : 'Offline'}</span>
+              <span className="info-value">{esp32.isConnected ? 'Active' : 'Offline'}</span>
             </div>
             <div className="info-item">
               <span className="info-label">Total Alerts</span>
-              <span className="info-value">{logs.length}</span>
+              <span className="info-value">{esp32.detectionStats.drowsy_frames || logs.length}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Blinks (30s)</span>
+              <span className="info-value">{esp32.detectionStats.blinks_30s || 0}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Yawns (60s)</span>
+              <span className="info-value">{esp32.detectionStats.yawns_60s || 0}</span>
             </div>
           </div>
         </div>

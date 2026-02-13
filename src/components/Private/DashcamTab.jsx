@@ -97,7 +97,6 @@ const DashcamTab = () => {
                     muted
                     playsInline
                     onError={(e) => {
-                      console.log('Video not found, showing placeholder');
                       e.target.style.display = 'none';
                     }}
                   />

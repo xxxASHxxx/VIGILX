@@ -72,9 +72,7 @@ const LandingPage = () => {
             preload="auto"
             className="hero-video"
             poster={`${process.env.PUBLIC_URL}/assets/images/highway3.jpg`}
-            onLoadedData={() => console.log('✅ Video loaded successfully')}
             onError={(e) => console.error('❌ Video error:', e.target.error)}
-            onPlay={() => console.log('▶️ Video playing')}
           >
             <source src={`${process.env.PUBLIC_URL}/assets/video/highway.mp4`} type="video/mp4" />
           </video>

@@ -4,6 +4,8 @@ import LandingPage from './components/LandingPage';
 import CommercialDashboard from './components/Commercial/CommercialDashboard';
 import PrivateDashboard from './components/Private/PrivateDashboard';
 import './App.css';
+import './styles/variables.css';
+import './styles/animations.css';
 
 function App() {
   return (
